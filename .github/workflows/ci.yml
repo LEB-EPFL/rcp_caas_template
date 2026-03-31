@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: extractions/setup-just@v3
+
+      - name: Create .env file
+        run: |
+          echo "IMAGE_NAME=leb-test" >> .env
+          echo "PROJECT_NAME=ci" >> .env
+
+      - name: Build image (local)
+        run: just build --local
+
+      - name: Run container and verify output
+        run: |
+          mkdir scratch
+          just run -m scratch
+          output=$(cat scratch/hello_leb_*.txt)
+          [ "$output" = "Hello, LEB!" ] || { echo "Unexpected output: $output"; exit 1; }

@@ -1,5 +1,7 @@
 # RCP CaaS Template
 
+[![CI](https://github.com/LEB-EPFL/rcp_caas_template/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/LEB-EPFL/rcp_caas_template/actions/workflows/ci.yml)
+
 A template repo for creating a container image to run on the EPFL RCP CaaS cluster.
 
 ## Quickstart
