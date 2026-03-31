@@ -56,8 +56,10 @@ Ask an admin to be added to the LEB's RCP CaaS users.
   - Download to your tmp directory: `curl -sLo /tmp/runai https://rcp-caas-prod.rcp.epfl.ch/cli/linux`
   - Install: `sudo install /tmp/runai /usr/local/bin/runai`
   - Verify installation: `runai version`
-6. Install `just` within the WSL: <https://just.systems/man/en/packages.html>
-  - If using the Ubuntu or Debian WSL distributions: `apt install just`
+6. Install `just` within the WSL: <https://just.systems/man/en/pre-built-binaries.html>
+  - Install the latest version from the shell script installer: `curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to ~/.local/bin`
+  - `~/.local.bin` should already be on your PATH if using a Ubuntu distribution for your WSL. Verify this by running: `echo $PATH`
+    - Note that `~` is shorthand for your home directory, i.e. `/home/USERNAME`.
   - `just` is a tool for mapping long commands, such as Docker commands, to short, user-defined alternatives
 
 All of the following console commands are assumed to be run from the WSL.
