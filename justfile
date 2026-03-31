@@ -1,6 +1,7 @@
 set dotenv-load
 
 DEFAULT_TAG := "latest"
+SCRATCH_FOLDER_GID := "84558"
 
 # Build the container image for this project
 [arg("local", long="local", short="l", value="local")]
@@ -72,4 +73,5 @@ submit name gpus="1":
     --image registry.rcp.epfl.ch/$PROJECT_NAME/$IMAGE_NAME:{{DEFAULT_TAG}} \
     --gpu {{gpus}} \
     --existing-pvc claimname=leb-scratch,path=/scratch \
-    --existing-pvc claimname=home,path=/home/$LDAP_USERNAME
+    --existing-pvc claimname=home,path=/home/$LDAP_USERNAME \
+    --supplemental-groups {{ SCRATCH_FOLDER_GID }}
