@@ -1,4 +1,12 @@
-FROM alpine:3.23.3
+FROM alpine:3.23.3 AS app
+
+# Install your software in this build stage.
+# It will be shared with the local and final images.
+
+COPY --chmod=755 test_script.sh /usr/local/bin/
+
+#=================================================================================================
+FROM app AS final
 
 # RCP CaaS requirements to access storage
 ARG LDAP_USERNAME
@@ -13,8 +21,9 @@ ARG LDAP_GID
 #   && chown -R ${LDAP_USERNAME}:${LDAP_GROUPNAME} /home/${LDAP_USERNAME}
 
 RUN addgroup -g ${LDAP_GID} ${LDAP_GROUPNAME} \
-  && adduser -D -s /bin/sh -G ${LDAP_GROUPNAME} -u ${LDAP_UID} ${LDAP_USERNAME}
-COPY --chmod=755 test_script.sh /usr/local/bin/
+  && adduser -D -s /bin/sh -G ${LDAP_GROUPNAME} -u ${LDAP_UID} ${LDAP_USERNAME} \
+  && mkdir -p /scratch \
+  && chown -R ${LDAP_USERNAME}:${LDAP_GROUPNAME} /scratch
 
 USER ${LDAP_USERNAME}
 WORKDIR /home/${LDAP_USERNAME}

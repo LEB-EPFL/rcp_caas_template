@@ -1,32 +1,33 @@
 set dotenv-load
 
+DEFAULT_TAG := "latest"
+
 # Build the container image for this project
-build VERSION="latest":
+[arg("local", long="local", short="l", value="local")]
+build local="":
   docker build . \
     --platform linux/amd64 \
-    --tag registry.rcp.epfl.ch/$PROJECT_NAME/$IMAGE_NAME:{{VERSION}} \
+    --tag registry.rcp.epfl.ch/$PROJECT_NAME/$IMAGE_NAME:{{ if local == "local" { "local" } else { DEFAULT_TAG } }} \
     --build-arg LDAP_GROUPNAME=leb \
-    --build-arg LDAP_GID="$LDAP_GID" \
-    --build-arg LDAP_USERNAME="$USERNAME" \
-    --build-arg LDAP_UID="$LDAP_UID"
+    --build-arg LDAP_GID={{if local == "local" { "$(id -g)" } else { "$LDAP_GID" } }} \
+    --build-arg LDAP_USERNAME={{if local == "local" { "$(whoami)" } else { "$LDAP_USERNAME" } }} \
+    --build-arg LDAP_UID={{if local == "local" { "$(id -u)" } else { "$LDAP_UID" } }}
 
 # Push the container image to the EPFL image registry
-push VERSION="latest":
-  docker push registry.rcp.epfl.ch/$PROJECT_NAME/$IMAGE_NAME:{{VERSION}}
+push: build
+  docker push registry.rcp.epfl.ch/$PROJECT_NAME/$IMAGE_NAME:{{DEFAULT_TAG}}
 
 # Run the container image locally (optionally mount a local folder from this directory into /scratch)
-[arg("VERSION", long, short = "v")]
-[arg("SCRATCH", long, short = "m")]
-run VERSION="latest" SCRATCH="":
-  docker run --rm -it {{ if SCRATCH != "" { "-v $(pwd)/" + SCRATCH + ":/scratch" } else { "" } }} \
-    registry.rcp.epfl.ch/$PROJECT_NAME/$IMAGE_NAME:{{VERSION}}
+[arg("scratch", long, short = "m")]
+run scratch="":
+  docker run --rm -it {{ if scratch != "" { "-v $(pwd)/" + scratch + ":/scratch" } else { "" } }} \
+    registry.rcp.epfl.ch/$PROJECT_NAME/$IMAGE_NAME:local
 
 # Run the container image with a shell (optionally mount a local folder from this directory into /scratch)
-[arg("VERSION", long, short = "v")]
-[arg("SCRATCH", long, short = "m")]
-shell VERSION="latest" SCRATCH="":
-  docker run --rm -it {{ if SCRATCH != "" { "-v $(pwd)/" + SCRATCH + ":/scratch" } else { "" } }} \
-    registry.rcp.epfl.ch/$PROJECT_NAME/$IMAGE_NAME:{{VERSION}} /bin/sh
+[arg("scratch", long, short = "m")]
+shell scratch="":
+  docker run --rm -it {{ if scratch != "" { "-v $(pwd)/" + scratch + ":/scratch" } else { "" } }} \
+    registry.rcp.epfl.ch/$PROJECT_NAME/$IMAGE_NAME:local /bin/sh
 
 # Add a secret to the Kubernetes cluster
 add-secret secret:
@@ -61,17 +62,14 @@ ls-pods:
 
 # List the contents of the scratch directory on the RCP cluster
 ls-scratch:
-  ssh "$USERNAME@jumphost.rcp.epfl.ch" "ls -la /mnt/leb/scratch"
+  ssh "$LDAP_USERNAME@jumphost.rcp.epfl.ch" "ls -la /mnt/leb/scratch"
 
 # Submit a job to the RCP cluster
-[arg("GPUS", long, short = "g")]
-[arg("VERSION", long, short = "v")]
-submit name GPUS="1" VERSION="latest":
+[arg("gpus", long, short = "g")]
+submit name gpus="1":
   runai submit \
     --name "{{name}}" \
-    --image registry.rcp.epfl.ch/$PROJECT_NAME/$IMAGE_NAME:{{VERSION}} \
-    --gpu {{GPUS}} \
+    --image registry.rcp.epfl.ch/$PROJECT_NAME/$IMAGE_NAME:{{DEFAULT_TAG}} \
+    --gpu {{gpus}} \
     --existing-pvc claimname=leb-scratch,path=/scratch \
-    --existing-pvc claimname=home,path=/home/$USERNAME \
-    --command \
-    -- /bin/ash -ic "sleep 600"
+    --existing-pvc claimname=home,path=/home/$LDAP_USERNAME

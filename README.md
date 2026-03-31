@@ -85,18 +85,18 @@ Create a file called `.env` in the root folder of this repository with the follo
 
 ```
 IMAGE_NAME=hello-leb
-LDAP_UID=XXXXXX
 LDAP_GID=XXXXX
+LDAP_UID=XXXXXX
+LDAP_USERNAME=XXX
 PROJECT_NAME=leb-test
 ROBOT_NAME=leb-test-robot
-USERNAME=XXXXXXXX
 ```
 
 - Replace `hello-leb` with the name of your container image. This should reflect what the software does.
 - Use the UID and GID values that you just found for `LDAP_UID` and `LDAP_GID`.
+- `LDAP_USERNAME` should be your EPFL GASPAR username.
 - `PROJECT_NAME` is the name given to the project in the Harbor registry. `leb-test` is a test project that we can use to test RCP CaaS workflows. Our other project is `leb-smartmicroscopy`.
 - `ROBOT_NAME` is the name of the robot user for the Harbor project. See [the section on creating a registry project](#optional-create-a-project-on-the-rcp-container-image-registry) for more information.
-- `USERNAME` should be your EPFL GASPAR username.
 
 The `.env` file is listed in the `.gitignore` file and is therefore ignored by Git. You will need to create it every time you set up this repository from scratch.
 
@@ -200,7 +200,7 @@ From the command line:
 
 ```console
 # Build the container image
-just build
+just build --local
 
 # Run the container locally
 just run
@@ -228,6 +228,7 @@ This assumes that you have logged in to the RCP Harbor Container Image Registry.
 just build
 
 # Push the image to the registry
+# (Will also build the container image if something has changed.)
 just push
 ```
 
