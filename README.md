@@ -303,3 +303,15 @@ just delete-job NAME
 ```console
 just --list
 ```
+
+## Admin Only
+
+To add lab members to the LEB Run:ai group:
+
+1. Navigate to <https://groups.epfl.ch>
+2. Select `All groups`
+3. Search for `rcp-runai-leb` and select it.
+4. Go to the members tab
+5. Click on Add members and add the user
+
+For more info on EPFL groups, see <https://www.epfl.ch/campus/services/groupes/gerer-les-membres/>.
