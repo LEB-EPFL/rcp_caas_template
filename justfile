@@ -20,7 +20,7 @@ push: build
 # Run the container image locally (optionally mount a local folder from this directory into /scratch)
 [arg("scratch", long, short = "m")]
 run scratch="":
-  docker run --rm -it {{ if scratch != "" { "-v $(pwd)/" + scratch + ":/scratch" } else { "" } }} \
+  docker run --rm {{ if scratch != "" { "-v $(pwd)/" + scratch + ":/scratch" } else { "" } }} \
     registry.rcp.epfl.ch/$PROJECT_NAME/$IMAGE_NAME:local
 
 # Run the container image with a shell (optionally mount a local folder from this directory into /scratch)
