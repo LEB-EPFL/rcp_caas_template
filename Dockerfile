@@ -1,4 +1,4 @@
-FROM alpine:3.23.3 AS app
+FROM alpine:3.23.4 AS app
 
 # Install your software in this build stage.
 # It will be shared with the local and final images.
